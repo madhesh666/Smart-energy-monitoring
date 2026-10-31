@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Energy Monitoring</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f1f5f9;
+  color: #172033;
+  padding: 30px;
+}
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+}
+
+header {
+  background: #142d4e;
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+header p {
+  margin-top: 8px;
+  color: #cbd5e1;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 15px;
+  background: #166534;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #0000000c;
+}
+
+.card p {
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.value {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+footer {
+  margin-top: 25px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media(max-width:600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  body {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <h1>Smart Energy Monitoring System</h1>
+  <p>Real-Time Electrical Parameter Monitoring</p>
+  <span class="status" id="status">DEMO MODE</span>
+</header>
+
+<div class="grid">
+
+  <div class="card">
+    <p>Voltage</p>
+    <div class="value" id="voltage">0.00 V</div>
+  </div>
+
+  <div class="card">
+    <p>Current</p>
+    <div class="value" id="current">0.00 A</div>
+  </div>
+
+  <div class="card">
+    <p>Power</p>
+    <div class="value" id="power">0.00 W</div>
+  </div>
+
+  <div class="card">
+    <p>Energy Consumption</p>
+    <div class="value" id="energy">0.000000 kWh</div>
+  </div>
+
+</div>
+
+<footer>
+  Smart Energy Monitoring | Virtual Prototype
+  <p id="updated">Waiting for demo readings...</p>
+</footer>
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+const socket = io();
+
+socket.on("connect", () => {
+    console.log("Backend Connected:", socket.id);
+});
+
+socket.on("energyData", (data) => {
+
+    console.log("Received Live Data:", data);
+
+    // Update Voltage
+    document.getElementById("voltage").textContent =
+        Number(data.voltage).toFixed(2) + " V";
+
+    // Update Current
+    document.getElementById("current").textContent =
+        Number(data.current).toFixed(2) + " A";
+
+    // Update Power
+    document.getElementById("power").textContent =
+        Number(data.power).toFixed(2) + " W";
+
+    // Update Energy
+    document.getElementById("energy").textContent =
+        Number(data.energy).toFixed(6) + " kWh";
+
+    // Update Status
+    document.getElementById("status").textContent =
+        "LIVE SIMULATION";
+
+    // Update Time
+    document.getElementById("updated").textContent =
+        "Last updated: " + new Date().toLocaleTimeString();
+});
+
+socket.on("disconnect", () => {
+    document.getElementById("status").textContent =
+        "DISCONNECTED";
+});
+
+socket.on("connect_error", (error) => {
+    console.log("Socket Error:", error.message);
+});
+</script>
+
+</body>
+</html>
+
